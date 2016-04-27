@@ -48,7 +48,11 @@
     if (event.metaKey)  PRESSED_MODS[91] = true;
   }
 
-  var forEach = Ember.EnumerableUtils.forEach;
+  function forEach(array, fn) {
+    for (var i = 0, len = array.length; i < len; i++) {
+      fn(array[i]);
+    }
+  }
 
   function makeDispatch(router, filters) {
     function triggerShortcut(def, event) {
@@ -176,7 +180,7 @@
     mergedProperties: ['shortcuts'],
     activate: function() {
       if (Object.keys(this.shortcuts).length > 0) {
-        register(Ember.keys(this.shortcuts), this.routeName);
+        register(Object.keys(this.shortcuts), this.routeName);
       }
     },
     deactivate: function() {
@@ -202,7 +206,8 @@
   Ember.onLoad('Ember.Application', function(Application) {
     Application.initializer({
       name: 'Ember Shortcuts',
-      initialize: function(container, application) {
+      initialize: function() {
+        var application = arguments[1] || arguments[0]; //compatible with both old and new initializers: https://github.com/satchmorun/ember-shortcuts/commit/8e23aa2a573f6195518cc1fb0e802117b55da183
         application.register('shortcuts:main', Ember.Shortcuts);
         application.inject('route', 'shortcuts', 'shortcuts:main');
         application.inject('controller', 'shortcuts', 'shortcuts:main');
